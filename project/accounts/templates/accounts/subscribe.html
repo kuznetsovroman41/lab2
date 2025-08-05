@@ -1,0 +1,10 @@
+{% if request.user.is_authenticated and request.user != user %}
+    <form method="post" action="{% url 'accounts:subscribe_toggle' user.username %}">
+        {% csrf_token %}
+        {% if user in request.user.subscriptions.values_list('following', flat=True) %}
+            <button type="submit">Отписаться</button>
+        {% else %}
+            <button type="submit">Подписаться</button>
+        {% endif %}
+    </form>
+{% endif %}
