@@ -1,0 +1,166 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Лента</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 0;
+    }
+
+    /* Навбар */
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 15px;
+      border-bottom: 1px solid #ddd;
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-weight: bold;
+      font-size: 24px;
+      color: #262626;
+      text-decoration: none;
+    }
+    .search form {
+      display: flex;
+      align-items: center;
+    }
+    .search input[type="text"] {
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+      width: 200px;
+    }
+    .profile-link img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      cursor: pointer;
+    }
+
+    /* Пост */
+    .post {
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+    .post-header {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+      object-fit: cover;
+    }
+    .post-image img {
+      width: 100%;
+      display: block;
+    }
+    .post-actions {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+    }
+    .post-actions form {
+      margin-right: 10px;
+    }
+    .post-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+    }
+    .likes-count {
+      font-weight: bold;
+      padding: 0 10px 10px 10px;
+    }
+    .post-description {
+      padding: 0 10px 10px 10px;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="navbar">
+    <a href="{% url 'webapp:home_feed' %}" class="logo">Instagram</a>
+
+    <div class="search">
+      <form method="get" action="{% url 'accounts:user_search' %}">
+        <input type="text" name="q" placeholder="Поиск">
+      </form>
+    </div>
+
+    <div class="profile-link">
+      <a href="{% url 'accounts:user_profile' user.username %}">
+        <img src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Профиль">
+      </a>
+    </div>
+  </header>
+
+  {% for post in posts %}
+  <div class="post">
+    <div class="post-header">
+      <a href="{% url 'accounts:user_profile' post.author.username %}">
+        <img src="{% if post.author.avatar %}{{ post.author.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар {{ post.author.username }}">
+      </a>
+      <a href="{% url 'accounts:user_profile' post.author.username %}"><strong>{{ post.author.username }}</strong></a>
+    </div>
+
+    <div class="post-image">
+      <a href="{% url 'webapp:post_detail' post.pk %}">
+        <img src="{{ post.image.url }}" alt="Фото поста">
+      </a>
+    </div>
+
+    <div class="post-actions">
+      <form method="post" action="{% url 'webapp:like_post' post.pk %}">
+        {% csrf_token %}
+        {% if user.is_authenticated %}
+          {% if post.has_liked %}
+            <button type="submit" title="Убрать лайк">❤️</button>
+          {% else %}
+            <button type="submit" title="Поставить лайк">🤍</button>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'accounts:login' %}">🤍</a>
+        {% endif %}
+      </form>
+      <a href="{% url 'webapp:post_detail' post.pk %}">💬 Комментарии</a>
+    </div>
+
+    <div class="likes-count">
+      {{ post.likes_count }} {{ post.likes_count|pluralize:"лайк,лайка,лайков" }}
+    </div>
+
+    <div class="post-description">
+      <strong>{{ post.author.username }}</strong> {{ post.description }}
+    </div>
+  </div>
+  {% empty %}
+  <p>Постов пока нет.</p>
+  {% endfor %}
+
+</body>
+</html>

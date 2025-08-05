@@ -1,18 +1,163 @@
-<h1>{{ post.title }}</h1>
-<p>{{ post.content }}</p>
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Публикация {{ post.id }}</title>
+  <link rel="stylesheet" href="{% static 'css/instagram_style.css' %}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 0;
+    }
+    .post-header {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+    }
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .post-image img {
+      width: 100%;
+      display: block;
+    }
+    .post-actions {
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    .post-actions form {
+      margin: 0;
+    }
+    .post-actions button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      line-height: 1;
+      padding: 0;
+      color: #333;
+    }
+    .post-actions button.liked {
+      color: #ed4956; /* красный цвет лайка */
+    }
+    .likes-count {
+      font-weight: bold;
+      padding: 10px;
+    }
+    .post-description {
+      padding: 0 10px 10px 10px;
+    }
+    .comments {
+      padding: 10px;
+      border-top: 1px solid #eee;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .comment {
+      margin-bottom: 8px;
+    }
+    .comment strong {
+      margin-right: 6px;
+    }
+    .add-comment-form {
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .add-comment-form textarea {
+      width: 100%;
+      height: 60px;
+      resize: none;
+    }
+    .add-comment-form button {
+      margin-top: 6px;
+      padding: 6px 12px;
+      background-color: #3897f0;
+      border: none;
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
 
-<form method="post" action="{% url 'like_post' post.pk %}">
-  {% csrf_token %}
+  <div class="post-header">
+    <img src="{% if post.author.avatar %}{{ post.author.avatar.url }}{% else %}{% static 'images/default_avatar.png' %}{% endif %}" alt="Аватар">
+    <strong>{{ post.author.username }}</strong>
+  </div>
+
+  <div class="post-image">
+    <img src="{{ post.image.url }}" alt="Фото поста">
+  </div>
+
+  <div class="post-actions">
+    <form method="post" action="{% url 'webapp:like_post' post.pk %}">
+      {% csrf_token %}
+      {% if user.is_authenticated %}
+        {% if has_liked %}
+          <button type="submit" title="Убрать лайк" class="liked">❤️</button>
+        {% else %}
+          <button type="submit" title="Поставить лайк">🤍</button>
+        {% endif %}
+      {% else %}
+        <a href="{% url 'accounts:login' %}">Войдите, чтобы лайкнуть</a>
+      {% endif %}
+    </form>
+    <button type="button" onclick="document.getElementById('comments-section').classList.toggle('hidden')" title="Показать/Скрыть комментарии">💬</button>
+  </div>
+
+  <div class="likes-count">
+    {{ post.likes.count }} {{ post.likes.count|pluralize:"лайк,лайка,лайков" }}
+  </div>
+
+  <div class="post-description">
+    <strong>{{ post.author.username }}</strong> {{ post.description }}
+  </div>
+
+  <div id="comments-section" class="comments hidden">
+    {% for comment in comments %}
+      <div class="comment">
+        <strong>{{ comment.author.username }}</strong>: {{ comment.text }}
+      </div>
+    {% empty %}
+      <p>Комментариев пока нет</p>
+    {% endfor %}
+  </div>
+
   {% if user.is_authenticated %}
-    {% if user in post.likes.all.values_list 'user_id' %}
-      <p>Вы уже лайкнули это.</p>
-    {% else %}
-      <button type="submit">Лайкнуть</button>
-    {% endif %}
-  {% else %}
-    <p><a href="{% url 'login' %}">Войдите</a>, чтобы лайкнуть.</p>
+    <div class="add-comment-form">
+      <form method="post" action="{% url 'webapp:add_comment' post.pk %}">
+        {% csrf_token %}
+        <textarea name="text" placeholder="Добавить комментарий..." required></textarea>
+        <button type="submit">Отправить</button>
+      </form>
+    </div>
   {% endif %}
-</form>
 
-<p>Лайков: {{ post.total_likes }}</p>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('comments-section').classList.add('hidden');
+  });
+</script>
+
+</body>
+</html>
+
+
 

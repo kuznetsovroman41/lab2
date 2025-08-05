@@ -19,3 +19,4 @@ class RegisterForm(UserCreationForm):
         if CustomUser.objects.filter(email=email).exists():
             raise forms.ValidationError('Пользователь с таким email уже существует.')
         return email
+

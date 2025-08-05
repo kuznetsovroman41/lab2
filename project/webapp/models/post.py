@@ -14,9 +14,4 @@ class Post(models.Model):
         return f'Публикация {self.id} от {self.author.username}'
 
 
-class PostCreateForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ['image', 'description']
-
 
