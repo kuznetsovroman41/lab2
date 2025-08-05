@@ -1,6 +1,6 @@
 from django.views.generic import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from webapp.models import Post
+from ..models import Post
 
 class HomeFeedView(LoginRequiredMixin, ListView):
     model = Post

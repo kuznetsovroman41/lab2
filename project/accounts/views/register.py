@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from django.views.generic import FormView
-from accounts.forms.register import RegisterForm
+from ..forms.register import RegisterForm
 from django.contrib.auth import login
 
 class RegisterView(FormView):

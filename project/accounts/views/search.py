@@ -1,7 +1,7 @@
 from django.views.generic import ListView
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from accounts.forms import UserSearchForm
+from ..forms import UserSearchForm
 
 User = get_user_model()
 

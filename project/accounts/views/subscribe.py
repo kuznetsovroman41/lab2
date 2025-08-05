@@ -2,7 +2,7 @@ from django.views import View
 from django.shortcuts import get_object_or_404, redirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import get_user_model
-from accounts.models import Subscription
+from ..models import Subscription
 
 User = get_user_model()
 
