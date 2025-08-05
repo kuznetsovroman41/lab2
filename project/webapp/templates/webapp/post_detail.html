@@ -4,7 +4,7 @@
 <form method="post" action="{% url 'like_post' post.pk %}">
   {% csrf_token %}
   {% if user.is_authenticated %}
-    {% if user in post.likes.all.values_list('user', flat=True) %}
+    {% if user in post.likes.all.values_list 'user_id' %}
       <p>Вы уже лайкнули это.</p>
     {% else %}
       <button type="submit">Лайкнуть</button>
@@ -15,3 +15,4 @@
 </form>
 
 <p>Лайков: {{ post.total_likes }}</p>
+
