@@ -106,21 +106,18 @@
     <img src="{{ post.image.url }}" alt="Фото поста">
   </div>
 
-  <div class="post-actions">
-    <form method="post" action="{% url 'webapp:like_post' post.pk %}">
-      {% csrf_token %}
-      {% if user.is_authenticated %}
-        {% if has_liked %}
-          <button type="submit" title="Убрать лайк" class="liked">❤️</button>
-        {% else %}
-          <button type="submit" title="Поставить лайк">🤍</button>
-        {% endif %}
-      {% else %}
+<div class="post-actions">
+    {% if user.is_authenticated %}
+        <button class="like-btn" data-id="{{ post.id }}" data-liked="{% if post.has_liked %}true{% else %}false{% endif %}">
+            {% if post.has_liked %}❤️{% else %}🤍{% endif %}
+        </button>
+    {% else %}
         <a href="{% url 'accounts:login' %}">Войдите, чтобы лайкнуть</a>
-      {% endif %}
-    </form>
-    <button type="button" onclick="document.getElementById('comments-section').classList.toggle('hidden')" title="Показать/Скрыть комментарии">💬</button>
-  </div>
+    {% endif %}
+    <a href="{% url 'webapp:post_detail' post.id %}">💬 Комментарии</a>
+</div>
+<div id="likes-count-{{ post.id }}">{{ post.likes_count }}</div>
+
 
   <div class="likes-count">
     {{ post.likes.count }} {{ post.likes.count|pluralize:"лайк,лайка,лайков" }}
@@ -150,11 +147,7 @@
     </div>
   {% endif %}
 
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('comments-section').classList.add('hidden');
-  });
-</script>
+<script src="{% static 'js/likes.js' %}"></script>
 
 </body>
 </html>

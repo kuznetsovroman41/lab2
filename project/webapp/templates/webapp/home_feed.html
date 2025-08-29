@@ -134,21 +134,17 @@
       </a>
     </div>
 
-    <div class="post-actions">
-      <form method="post" action="{% url 'webapp:like_post' post.pk %}">
-        {% csrf_token %}
-        {% if user.is_authenticated %}
-          {% if post.has_liked %}
-            <button type="submit" title="Убрать лайк">❤️</button>
-          {% else %}
-            <button type="submit" title="Поставить лайк">🤍</button>
-          {% endif %}
-        {% else %}
-          <a href="{% url 'accounts:login' %}">🤍</a>
-        {% endif %}
-      </form>
-      <a href="{% url 'webapp:post_detail' post.pk %}">💬 Комментарии</a>
-    </div>
+<div class="post-actions">
+    {% if user.is_authenticated %}
+      <button class="like-btn" data-id="{{ post.pk }}" title="{% if post.has_liked %}Убрать лайк{% else %}Поставить лайк{% endif %}">
+        {% if post.has_liked %}❤️{% else %}🤍{% endif %}
+      </button>
+    {% else %}
+      <a href="{% url 'accounts:login' %}">🤍</a>
+    {% endif %}
+    <a href="{% url 'webapp:post_detail' post.pk %}">💬 Комментарии</a>
+</div>
+
 
     <div class="likes-count">
       {{ post.likes_count }} {{ post.likes_count|pluralize:"лайк,лайка,лайков" }}
@@ -161,6 +157,6 @@
   {% empty %}
   <p>Постов пока нет.</p>
   {% endfor %}
-
+<script src="{% static 'js/likes.js' %}"></script>
 </body>
 </html>
