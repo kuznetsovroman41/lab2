@@ -25,3 +25,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls', namespace='accounts')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+api_urls = [
+    path('v1/', include('api_v1.urls')),
+]
